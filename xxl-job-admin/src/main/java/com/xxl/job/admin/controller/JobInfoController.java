@@ -1,6 +1,6 @@
 package com.xxl.job.admin.controller;
 
-import com.xxl.job.admin.core.cron.CronExpression;
+import com.xxl.job.admin.controller.annotation.PermissionLimit;
 import com.xxl.job.admin.core.exception.XxlJobException;
 import com.xxl.job.admin.core.model.XxlJobGroup;
 import com.xxl.job.admin.core.model.XxlJobInfo;
@@ -21,6 +21,7 @@ import com.xxl.job.core.glue.GlueTypeEnum;
 import com.xxl.job.core.util.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,7 +30,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.text.ParseException;
 import java.util.*;
 
 /**
@@ -45,6 +45,12 @@ public class JobInfoController {
 	private XxlJobGroupDao xxlJobGroupDao;
 	@Resource
 	private XxlJobService xxlJobService;
+
+	@Value("${emaily.access_token.key}")
+	private String emailyAccessTokenKey;
+
+	@Value("${emaily.access_token.value}")
+	private String emailyAccessTokenValue;
 	
 	@RequestMapping
 	public String index(HttpServletRequest request, Model model, @RequestParam(required = false, defaultValue = "-1") int jobGroup) {
@@ -176,5 +182,15 @@ public class JobInfoController {
 		return new ReturnT<List<String>>(result);
 
 	}
-	
+
+	@RequestMapping("/add-and-start")
+	@ResponseBody
+	@PermissionLimit(limit = false)
+	public ReturnT<String> addAndStart(HttpServletRequest request, XxlJobInfo jobInfo) {
+		if (!request.getHeader(emailyAccessTokenKey).equals(emailyAccessTokenValue)) {
+			logger.error("[XXL-JOB-ADMIN: addAndStart @-1] Emaily access token is wrong!");
+			return new ReturnT<String>(ReturnT.FAIL_CODE, "Emaily access token is wrong!");
+		}
+		return xxlJobService.addAndStart(jobInfo);
+	}
 }

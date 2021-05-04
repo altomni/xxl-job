@@ -82,7 +82,11 @@ $(function() {
 	        	obj.jobGroup = $('#jobGroup').val();
 	        	obj.jobId = $('#jobId').val();
                 obj.logStatus = $('#logStatus').val();
-				obj.filterTime = $('#filterTime').val();
+				var timeRange = $('#filterTime').val().split(" - ");
+				var fromTime = new Date(timeRange[0]).toISOString().substr(0, 19).replace("T", " ");
+				var toTime = new Date(timeRange[1]).toISOString().substr(0, 19).replace("T", " ");
+				obj.filterTime = fromTime + ' - ' + toTime;
+				//obj.filterTime = $('#filterTime').val();
 	        	obj.start = d.start;
 	        	obj.length = d.length;
                 return obj;
