@@ -431,4 +431,13 @@ public class XxlJobServiceImpl implements XxlJobService {
 		return new ReturnT<Map<String, Object>>(result);
 	}
 
+	@Override
+	public ReturnT<String> addAndStart(XxlJobInfo jobInfo) {
+		ReturnT<String> add = this.add(jobInfo);
+		if (add.getCode() == ReturnT.FAIL_CODE){
+			return add;
+		}
+		ReturnT<String> start = this.start(Integer.parseInt(add.getContent()));
+		return start;
+	}
 }
