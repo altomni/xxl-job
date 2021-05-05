@@ -10,4 +10,6 @@ ENV PARAMS=""
 
 ADD target/xxl-job-admin-*.jar /app.jar
 
+EXPOSE 8080
+
 ENTRYPOINT ["sh","-c","java -jar $JAVA_OPTS /app.jar $PARAMS"]
