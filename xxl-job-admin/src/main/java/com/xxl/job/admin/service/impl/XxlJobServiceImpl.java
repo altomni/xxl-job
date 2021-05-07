@@ -437,7 +437,24 @@ public class XxlJobServiceImpl implements XxlJobService {
 		if (add.getCode() == ReturnT.FAIL_CODE){
 			return add;
 		}
-		ReturnT<String> start = this.start(Integer.parseInt(add.getContent()));
+		String jobInfoId = add.getContent();
+		ReturnT<String> start = this.start(Integer.parseInt(jobInfoId));
+		if (start.getCode() == ReturnT.SUCCESS_CODE){
+			start.setContent(jobInfoId);
+		}
+		return start;
+	}
+
+	@Override
+	public ReturnT<String> updateAndStart(XxlJobInfo jobInfo) {
+		ReturnT<String> update = this.update(jobInfo);
+		if (update.getCode() == ReturnT.FAIL_CODE){
+			return update;
+		}
+		ReturnT<String> start = this.start(jobInfo.getId());
+		if (start.getCode() == ReturnT.SUCCESS_CODE){
+			start.setContent(String.valueOf(jobInfo.getId()));
+		}
 		return start;
 	}
 }
