@@ -51,10 +51,39 @@ $(function() {
 					{
 						"data": 'scheduleType',
 						"visible" : true,
-						"width":'13%',
+						"width":'18%',
 						"render": function ( data, type, row ) {
 							if (row.scheduleConf) {
-								return row.scheduleType + '：'+ row.scheduleConf;
+								const str = row.scheduleType + '：'+ row.scheduleConf;
+								if (row.scheduleConf.indexOf("*") == -1
+									&& row.scheduleConf.indexOf("/") == -1
+									&& row.scheduleConf.indexOf(",") == -1
+									&& row.scheduleConf.indexOf("-") == -1){
+									const format='ss mm HH dd MM ? yyyy';
+									const secondIndex = format.indexOf("ss");
+									const minuteIndex = format.indexOf("mm");
+									const hourIndex = format.indexOf("HH");
+									const dayIndex = format.indexOf("dd");
+									const monthIndex = format.indexOf("MM");
+									const yearIndex = format.indexOf("yyyy");
+									const utcTime = row.scheduleConf.substr(yearIndex, 4) + '-' +
+										row.scheduleConf.substr(monthIndex, 2) + '-' +
+										row.scheduleConf.substr(dayIndex, 2) + 'T' +
+										row.scheduleConf.substr(hourIndex, 2) + ':' +
+										row.scheduleConf.substr(minuteIndex, 2) + ':' +
+										row.scheduleConf.substr(secondIndex, 2) + 'Z';
+									const localTime = new Date(utcTime);
+									const strLocalDate = moment(localTime).format("YYYY-MM-DD HH:mm:ss");
+									if (strLocalDate != 'Invalid date'){
+										let colorLocalDate = '<br> (Local: <font color="blue">' + strLocalDate + '</font>)';
+										if (row.triggerStatus == 1
+											&& localTime.getTime() - Date.now() < 1000*60*60){ // 1 hour
+											colorLocalDate = '<br> (Local: <font color="red">' + strLocalDate + '</font>)';
+										}
+										return str + colorLocalDate
+									}
+								}
+								return str;
 							} else {
 								return row.scheduleType;
 							}
@@ -62,7 +91,7 @@ $(function() {
 					},
 					{
 						"data": 'glueType',
-						"width":'25%',
+						"width":'20%',
 						"visible" : true,
 						"render": function ( data, type, row ) {
 							var glueTypeTitle = findGlueTypeTitle(row.glueType);
