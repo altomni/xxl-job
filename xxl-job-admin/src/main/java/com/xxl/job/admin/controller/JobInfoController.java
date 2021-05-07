@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -192,5 +193,70 @@ public class JobInfoController {
 			return new ReturnT<String>(ReturnT.FAIL_CODE, "Emaily access token is wrong!");
 		}
 		return xxlJobService.addAndStart(jobInfo);
+	}
+
+	@RequestMapping("/update-and-start")
+	@ResponseBody
+	@PermissionLimit(limit = false)
+	public ReturnT<String> updateAndStart(HttpServletRequest request, XxlJobInfo jobInfo) {
+		if (!request.getHeader(emailyAccessTokenKey).equals(emailyAccessTokenValue)) {
+			logger.error("[XXL-JOB-ADMIN: addAndStart @-1] Emaily access token is wrong!");
+			return new ReturnT<String>(ReturnT.FAIL_CODE, "Emaily access token is wrong!");
+		}
+		return xxlJobService.updateAndStart(jobInfo);
+	}
+
+	@RequestMapping("/cancel-jobs")
+	@ResponseBody
+	@PermissionLimit(limit = false)
+	public ReturnT<List<Integer>> cancelJobs(HttpServletRequest request, @RequestBody Map<String, String> jobMap) {
+		logger.info("[XXL-JOB-ADMIN: cancelJobs @-1] cancel jobs: {}", jobMap);
+		if (!request.getHeader(emailyAccessTokenKey).equals(emailyAccessTokenValue)) {
+			logger.error("[XXL-JOB-ADMIN: cancelJobs @-1] Emaily access token is wrong!");
+			return new ReturnT<List<Integer>>(ReturnT.FAIL_CODE, "Emaily access token is wrong!");
+		}
+		Set<String> failedCampaigns = new HashSet<>();
+		List<Integer> successfulJobIds = new ArrayList<>();
+		for (String jobId : jobMap.keySet()) {
+			if (xxlJobService.stop(Integer.parseInt(jobId)).getCode() == ReturnT.SUCCESS_CODE){
+				successfulJobIds.add(Integer.parseInt(jobId));
+			}else {
+				failedCampaigns.add(jobMap.get(jobId));
+			}
+		}
+
+		if (failedCampaigns.isEmpty()){
+			return new ReturnT<List<Integer>>(successfulJobIds);
+		}
+		ReturnT<List<Integer>> returnT = new ReturnT<>(ReturnT.FAIL_CODE, "Failed Cancel Campaigns: " + String.join(",", failedCampaigns));
+		returnT.setContent(successfulJobIds);
+		return returnT;
+	}
+
+	@RequestMapping("/start-jobs")
+	@ResponseBody
+	@PermissionLimit(limit = false)
+	public ReturnT<List<Integer>> startJobs(HttpServletRequest request, @RequestBody Map<Integer, String> jobMap) {
+		logger.info("[XXL-JOB-ADMIN: startJobs @-1] start jobs: {}", jobMap);
+		if (!request.getHeader(emailyAccessTokenKey).equals(emailyAccessTokenValue)) {
+			logger.error("[XXL-JOB-ADMIN: startJobs @-1] Emaily access token is wrong!");
+			return new ReturnT<List<Integer>>(ReturnT.FAIL_CODE, "Emaily access token is wrong!");
+		}
+		Set<String> failedCampaigns = new HashSet<>();
+		List<Integer> successfulJobIds = new ArrayList<>();
+		for (Integer jobId : jobMap.keySet()) {
+			if (xxlJobService.start(jobId).getCode() == ReturnT.SUCCESS_CODE){
+				successfulJobIds.add(jobId);
+			}else {
+				failedCampaigns.add(jobMap.get(jobId));
+			}
+		}
+
+		if (failedCampaigns.isEmpty()){
+			return new ReturnT<>(successfulJobIds);
+		}
+		ReturnT<List<Integer>> returnT = new ReturnT<>(ReturnT.FAIL_CODE, "Failed Start Campaigns: " + String.join(",", failedCampaigns));
+		returnT.setContent(successfulJobIds);
+		return returnT;
 	}
 }

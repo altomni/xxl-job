@@ -91,4 +91,12 @@ public interface XxlJobService {
 	 */
 	public ReturnT<String> addAndStart(XxlJobInfo jobInfo);
 
+	/**
+	 * update and start job
+	 *
+	 * @param jobInfo
+	 * @return
+	 */
+	public ReturnT<String> updateAndStart(XxlJobInfo jobInfo);
+
 }
