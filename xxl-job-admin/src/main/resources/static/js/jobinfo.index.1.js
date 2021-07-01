@@ -77,8 +77,11 @@ $(function() {
 									if (strLocalDate != 'Invalid date'){
 										let colorLocalDate = '<br> (Local: <font color="blue">' + strLocalDate + '</font>)';
 										if (row.triggerStatus == 1
-											&& localTime.getTime() - Date.now() < 1000*60*60){ // 1 hour
+											&& localTime.getTime() - Date.now() < 1000*60*60*12){ // 12 hour
 											colorLocalDate = '<br> (Local: <font color="red">' + strLocalDate + '</font>)';
+										}
+										if (localTime.getTime() - Date.now() < 0){
+											colorLocalDate = '<br> (Local: <font color="black">' + strLocalDate + '</font>)';
 										}
 										return str + colorLocalDate
 									}

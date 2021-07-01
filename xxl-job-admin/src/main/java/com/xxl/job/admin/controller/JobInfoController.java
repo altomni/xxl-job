@@ -188,10 +188,12 @@ public class JobInfoController {
 	@ResponseBody
 	@PermissionLimit(limit = false)
 	public ReturnT<String> addAndStart(HttpServletRequest request, XxlJobInfo jobInfo) {
+		logger.info(jobInfo.toString());
 		if (!request.getHeader(emailyAccessTokenKey).equals(emailyAccessTokenValue)) {
 			logger.error("[XXL-JOB-ADMIN: addAndStart @-1] Emaily access token is wrong!");
 			return new ReturnT<String>(ReturnT.FAIL_CODE, "Emaily access token is wrong!");
 		}
+
 		return xxlJobService.addAndStart(jobInfo);
 	}
 
