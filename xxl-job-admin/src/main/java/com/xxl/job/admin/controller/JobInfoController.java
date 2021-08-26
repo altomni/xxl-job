@@ -1,5 +1,7 @@
 package com.xxl.job.admin.controller;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.xxl.job.admin.controller.annotation.PermissionLimit;
 import com.xxl.job.admin.core.exception.XxlJobException;
 import com.xxl.job.admin.core.model.XxlJobGroup;
@@ -13,6 +15,7 @@ import com.xxl.job.admin.core.thread.JobTriggerPoolHelper;
 import com.xxl.job.admin.core.trigger.TriggerTypeEnum;
 import com.xxl.job.admin.core.util.I18nUtil;
 import com.xxl.job.admin.dao.XxlJobGroupDao;
+import com.xxl.job.admin.dao.XxlJobInfoDao;
 import com.xxl.job.admin.service.LoginService;
 import com.xxl.job.admin.service.XxlJobService;
 import com.xxl.job.core.biz.model.ReturnT;
@@ -52,7 +55,10 @@ public class JobInfoController {
 
 	@Value("${emaily.access_token.value}")
 	private String emailyAccessTokenValue;
-	
+
+	@Resource
+	private XxlJobInfoDao xxlJobInfoDao;
+
 	@RequestMapping
 	public String index(HttpServletRequest request, Model model, @RequestParam(required = false, defaultValue = "-1") int jobGroup) {
 
@@ -104,46 +110,46 @@ public class JobInfoController {
 			throw new RuntimeException(I18nUtil.getString("system_permission_limit") + "[username="+ loginUser.getUsername() +"]");
 		}
 	}
-	
+
 	@RequestMapping("/pageList")
 	@ResponseBody
-	public Map<String, Object> pageList(@RequestParam(required = false, defaultValue = "0") int start,  
+	public Map<String, Object> pageList(@RequestParam(required = false, defaultValue = "0") int start,
 			@RequestParam(required = false, defaultValue = "10") int length,
 			int jobGroup, int triggerStatus, String jobDesc, String executorHandler, String author) {
-		
+
 		return xxlJobService.pageList(start, length, jobGroup, triggerStatus, jobDesc, executorHandler, author);
 	}
-	
+
 	@RequestMapping("/add")
 	@ResponseBody
 	public ReturnT<String> add(XxlJobInfo jobInfo) {
 		return xxlJobService.add(jobInfo);
 	}
-	
+
 	@RequestMapping("/update")
 	@ResponseBody
 	public ReturnT<String> update(XxlJobInfo jobInfo) {
 		return xxlJobService.update(jobInfo);
 	}
-	
+
 	@RequestMapping("/remove")
 	@ResponseBody
 	public ReturnT<String> remove(int id) {
 		return xxlJobService.remove(id);
 	}
-	
+
 	@RequestMapping("/stop")
 	@ResponseBody
 	public ReturnT<String> pause(int id) {
 		return xxlJobService.stop(id);
 	}
-	
+
 	@RequestMapping("/start")
 	@ResponseBody
 	public ReturnT<String> start(int id) {
 		return xxlJobService.start(id);
 	}
-	
+
 	@RequestMapping("/trigger")
 	@ResponseBody
 	//@PermissionLimit(limit = false)
@@ -154,6 +160,32 @@ public class JobInfoController {
 		}
 
 		JobTriggerPoolHelper.trigger(id, TriggerTypeEnum.MANUAL, -1, null, executorParam, addressList);
+		return ReturnT.SUCCESS;
+	}
+
+
+	@RequestMapping("/triggerOnce")
+	@ResponseBody
+	@PermissionLimit(limit = false)
+	public ReturnT<String> triggerJobForHitalent(int id,Long jobId) {
+		// force cover job param
+
+		XxlJobInfo jobInfo = xxlJobInfoDao.loadById(id);
+		if(jobInfo == null)
+		{
+			return  ReturnT.FAIL;
+		}
+		String params = jobInfo.getExecutorParam();
+		if(jobId != null)
+		{
+
+			Gson gson = new Gson();
+			JsonObject object = gson.fromJson(params,JsonObject.class);
+			object.addProperty("jobId",jobId);
+			params = gson.toJson(object);
+			//System.out.println("-----------------param:"+params);
+		}
+		JobTriggerPoolHelper.trigger(id, TriggerTypeEnum.MANUAL, -1, null, params, null);
 		return ReturnT.SUCCESS;
 	}
 
