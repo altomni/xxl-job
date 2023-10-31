@@ -1,6 +1,7 @@
 package com.xxl.job.admin.service.impl;
 
 import com.xxl.job.admin.core.cron.CronExpression;
+import com.xxl.job.admin.core.dto.XxlJobUpdateBySendTime;
 import com.xxl.job.admin.core.model.XxlJobGroup;
 import com.xxl.job.admin.core.model.XxlJobInfo;
 import com.xxl.job.admin.core.model.XxlJobLogReport;
@@ -41,7 +42,7 @@ public class XxlJobServiceImpl implements XxlJobService {
 	private XxlJobLogGlueDao xxlJobLogGlueDao;
 	@Resource
 	private XxlJobLogReportDao xxlJobLogReportDao;
-	
+
 	@Override
 	public Map<String, Object> pageList(int start, int length, int jobGroup, int triggerStatus, String jobDesc, String executorHandler, String author) {
 
@@ -457,4 +458,19 @@ public class XxlJobServiceImpl implements XxlJobService {
 		}
 		return start;
 	}
+
+	@Override
+	public ReturnT<String> deleteJobs(List<Integer> ids) {
+		xxlJobInfoDao.deleteAllByIdInBatch(ids);
+		xxlJobLogDao.deleteAllByJobIdInBatch(ids);
+		xxlJobLogGlueDao.deleteAllByJobIdInBatch(ids);
+		return ReturnT.SUCCESS;
+	}
+
+	@Override
+	public ReturnT<String> updateJobsBySendTime(List<XxlJobUpdateBySendTime> xxlJobUpdateBySendTimeList) {
+		xxlJobInfoDao.updateScheduleAndParamBySendTimeBatch(xxlJobUpdateBySendTimeList);
+		return ReturnT.SUCCESS;
+	}
+
 }

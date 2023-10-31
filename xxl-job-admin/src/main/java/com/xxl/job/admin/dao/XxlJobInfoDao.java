@@ -1,5 +1,6 @@
 package com.xxl.job.admin.dao;
 
+import com.xxl.job.admin.core.dto.XxlJobUpdateBySendTime;
 import com.xxl.job.admin.core.model.XxlJobInfo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -37,6 +38,8 @@ public interface XxlJobInfoDao {
 	
 	public int delete(@Param("id") long id);
 
+	int deleteAllByIdInBatch(@Param("ids") List<Integer> ids);
+
 	public List<XxlJobInfo> getJobsByGroup(@Param("jobGroup") int jobGroup);
 
 	public int findAllCount();
@@ -45,5 +48,10 @@ public interface XxlJobInfoDao {
 
 	public int scheduleUpdate(XxlJobInfo xxlJobInfo);
 
+	List<XxlJobInfo> findAllByIdIn(@Param("idList") List<Integer> idList);
+
+	int updateScheduleAndParamBySendTime(XxlJobUpdateBySendTime xxlJobUpdateBySendTime);
+
+	int updateScheduleAndParamBySendTimeBatch(@Param("xxlJobInfoList") List<XxlJobUpdateBySendTime> xxlJobUpdateBySendTime);
 
 }

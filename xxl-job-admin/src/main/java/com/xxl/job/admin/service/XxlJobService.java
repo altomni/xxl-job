@@ -1,10 +1,13 @@
 package com.xxl.job.admin.service;
 
 
+import com.xxl.job.admin.core.dto.XxlJobUpdateBySendTime;
+import com.xxl.job.admin.core.model.XxlExtendJobInfo;
 import com.xxl.job.admin.core.model.XxlJobInfo;
 import com.xxl.job.core.biz.model.ReturnT;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -98,5 +101,9 @@ public interface XxlJobService {
 	 * @return
 	 */
 	public ReturnT<String> updateAndStart(XxlJobInfo jobInfo);
+
+	ReturnT<String> deleteJobs(List<Integer> ids);
+
+	ReturnT<String> updateJobsBySendTime(List<XxlJobUpdateBySendTime> xxlJobUpdateBySendTime);
 
 }

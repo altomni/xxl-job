@@ -3,7 +3,9 @@ package com.xxl.job.admin.controller;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.xxl.job.admin.controller.annotation.PermissionLimit;
+import com.xxl.job.admin.core.dto.XxlJobUpdateBySendTime;
 import com.xxl.job.admin.core.exception.XxlJobException;
+import com.xxl.job.admin.core.model.XxlExtendJobInfo;
 import com.xxl.job.admin.core.model.XxlJobGroup;
 import com.xxl.job.admin.core.model.XxlJobInfo;
 import com.xxl.job.admin.core.model.XxlJobUser;
@@ -27,10 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -293,4 +292,32 @@ public class JobInfoController {
 		returnT.setContent(successfulJobIds);
 		return returnT;
 	}
+
+	@RequestMapping("/add-jobs")
+	@ResponseBody
+	public ReturnT<Map<String, Integer>> addJobs(@RequestBody List<XxlExtendJobInfo> jobInfoList) {
+		Map<String, Integer> successfulJobIds = new HashMap<>(16);
+		jobInfoList.forEach(jobInfo -> {
+			ReturnT<String> jobReturn = xxlJobService.add(jobInfo);
+			if (jobReturn.getCode() == ReturnT.SUCCESS_CODE){
+				successfulJobIds.put(jobInfo.getOnlyId(), Integer.parseInt(jobReturn.getContent()));
+			}
+		});
+		return new ReturnT<>(successfulJobIds);
+	}
+
+	@RequestMapping("/delete-jobs")
+	@ResponseBody
+	public ReturnT<String> remove(@RequestBody List<Integer> ids) {
+		logger.info("[XXL-JOB-ADMIN: delete jobs @-1] delete jobs: {}", ids);
+		return xxlJobService.deleteJobs(ids);
+	}
+
+	@PostMapping("/update-jobs-by-sendTime")
+	@ResponseBody
+	public ReturnT<String> updateJobsBySendTime(@RequestBody List<XxlJobUpdateBySendTime> xxlJobUpdateBySendTime) {
+		logger.info("[XXL-JOB-ADMIN: update jobs by sendTime @-1] param : {}", xxlJobUpdateBySendTime);
+		return xxlJobService.updateJobsBySendTime(xxlJobUpdateBySendTime);
+	}
+
 }
