@@ -15,6 +15,8 @@ public class XxlJobUpdateBySendTime {
 
     private String cron;
 
+    private Integer triggerStatus = 1;
+
     public XxlJobUpdateBySendTime(Integer xxlJobId, Object reminderConfig, String sendTime, String cron) {
         this.xxlJobId = xxlJobId;
         this.reminderConfig = reminderConfig;
@@ -55,6 +57,14 @@ public class XxlJobUpdateBySendTime {
 
     public void setCron(String cron) {
         this.cron = cron;
+    }
+
+    public Integer getTriggerStatus() {
+        return triggerStatus;
+    }
+
+    public void setTriggerStatus(Integer triggerStatus) {
+        this.triggerStatus = triggerStatus;
     }
 
     @Override
