@@ -11,11 +11,11 @@ public class XxlJobUpdateBySendTime {
     private Object reminderConfig;
 
     //入参的json中
-    private Instant sendTime;
+    private String sendTime;
 
     private String cron;
 
-    public XxlJobUpdateBySendTime(Integer xxlJobId, Object reminderConfig, Instant sendTime, String cron) {
+    public XxlJobUpdateBySendTime(Integer xxlJobId, Object reminderConfig, String sendTime, String cron) {
         this.xxlJobId = xxlJobId;
         this.reminderConfig = reminderConfig;
         this.sendTime = sendTime;
@@ -41,11 +41,11 @@ public class XxlJobUpdateBySendTime {
         this.reminderConfig = reminderConfig;
     }
 
-    public Instant getSendTime() {
+    public String getSendTime() {
         return sendTime;
     }
 
-    public void setSendTime(Instant sendTime) {
+    public void setSendTime(String sendTime) {
         this.sendTime = sendTime;
     }
 
