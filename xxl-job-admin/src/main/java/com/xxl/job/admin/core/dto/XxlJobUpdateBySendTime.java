@@ -1,8 +1,8 @@
 package com.xxl.job.admin.core.dto;
 
-import java.time.Instant;
+import java.io.Serializable;
 
-public class XxlJobUpdateBySendTime {
+public class XxlJobUpdateBySendTime implements Serializable {
 
     //修改的标识
     private Integer xxlJobId;
@@ -14,6 +14,9 @@ public class XxlJobUpdateBySendTime {
     public XxlJobUpdateBySendTime(Integer xxlJobId, String cron) {
         this.xxlJobId = xxlJobId;
         this.cron = cron;
+    }
+
+    public XxlJobUpdateBySendTime() {
     }
 
     public Integer getXxlJobId() {
