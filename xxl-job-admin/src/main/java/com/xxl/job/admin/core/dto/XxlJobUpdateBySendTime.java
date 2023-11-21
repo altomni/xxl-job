@@ -1,7 +1,5 @@
 package com.xxl.job.admin.core.dto;
 
-import java.time.Instant;
-
 public class XxlJobUpdateBySendTime {
 
     //修改的标识
@@ -14,6 +12,9 @@ public class XxlJobUpdateBySendTime {
     public XxlJobUpdateBySendTime(Integer xxlJobId, String cron) {
         this.xxlJobId = xxlJobId;
         this.cron = cron;
+    }
+
+    public XxlJobUpdateBySendTime() {
     }
 
     public Integer getXxlJobId() {
