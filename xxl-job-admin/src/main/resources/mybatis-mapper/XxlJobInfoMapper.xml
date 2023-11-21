@@ -257,19 +257,10 @@
 		WHERE id = #{id}
 	</update>
 
-	<update id="updateScheduleAndParamBySendTime" parameterType="com.xxl.job.admin.core.dto.XxlJobUpdateBySendTime">
-		UPDATE xxl_job_info
-		SET executor_param = JSON_SET(executor_param, '$.reminderConfig', #{reminderConfig},'$.sendTime', #{sendTime}),
-			schedule_conf = #{cron},
-			trigger_status = #{triggerStatus}
-		WHERE id = #{xxlJobId}
-	</update>
-
 	<update id="updateScheduleAndParamBySendTimeBatch" parameterType="java.util.List">
 		<foreach collection="xxlJobInfoList" item="item" index="index" open="" close="" separator=";">
 			UPDATE xxl_job_info
 			set schedule_conf = #{item.cron},
-			executor_param = JSON_SET(executor_param, '$.reminderConfig', #{item.reminderConfig}, '$.sendTime', #{item.sendTime}),
 			trigger_status = #{item.triggerStatus}
 			WHERE id = #{item.xxlJobId}
 		</foreach>

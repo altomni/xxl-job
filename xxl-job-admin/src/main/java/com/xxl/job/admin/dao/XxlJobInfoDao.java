@@ -50,8 +50,6 @@ public interface XxlJobInfoDao {
 
 	List<XxlJobInfo> findAllByIdIn(@Param("idList") List<Integer> idList);
 
-	int updateScheduleAndParamBySendTime(XxlJobUpdateBySendTime xxlJobUpdateBySendTime);
-
 	int updateScheduleAndParamBySendTimeBatch(@Param("xxlJobInfoList") List<XxlJobUpdateBySendTime> xxlJobUpdateBySendTime);
 
 }

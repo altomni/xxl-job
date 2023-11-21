@@ -7,24 +7,13 @@ public class XxlJobUpdateBySendTime {
     //修改的标识
     private Integer xxlJobId;
 
-    //入参的json中
-    private Object reminderConfig;
-
-    //入参的json中
-    private String sendTime;
-
     private String cron;
 
     private Integer triggerStatus = 1;
 
-    public XxlJobUpdateBySendTime(Integer xxlJobId, Object reminderConfig, String sendTime, String cron) {
+    public XxlJobUpdateBySendTime(Integer xxlJobId, String cron) {
         this.xxlJobId = xxlJobId;
-        this.reminderConfig = reminderConfig;
-        this.sendTime = sendTime;
         this.cron = cron;
-    }
-
-    public XxlJobUpdateBySendTime() {
     }
 
     public Integer getXxlJobId() {
@@ -33,22 +22,6 @@ public class XxlJobUpdateBySendTime {
 
     public void setXxlJobId(Integer xxlJobId) {
         this.xxlJobId = xxlJobId;
-    }
-
-    public Object getReminderConfig() {
-        return reminderConfig;
-    }
-
-    public void setReminderConfig(Object reminderConfig) {
-        this.reminderConfig = reminderConfig;
-    }
-
-    public String getSendTime() {
-        return sendTime;
-    }
-
-    public void setSendTime(String sendTime) {
-        this.sendTime = sendTime;
     }
 
     public String getCron() {
@@ -71,9 +44,8 @@ public class XxlJobUpdateBySendTime {
     public String toString() {
         return "XxlJobUpdateBySendTime{" +
                 "xxlJobId=" + xxlJobId +
-                ", reminderConfig=" + reminderConfig +
-                ", sendTime=" + sendTime +
                 ", cron='" + cron + '\'' +
+                ", triggerStatus=" + triggerStatus +
                 '}';
     }
 }
