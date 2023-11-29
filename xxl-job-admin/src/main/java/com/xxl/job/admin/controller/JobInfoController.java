@@ -242,6 +242,12 @@ public class JobInfoController {
 		logger.info(jobInfo.toString());
 		logger.info(request.toString());
 		logger.info(request.getHeaderNames().toString());
+		Enumeration<String> headerNames = request.getHeaderNames();
+		while (headerNames.hasMoreElements()) {
+			String headerName = headerNames.nextElement();
+			String headerValue = request.getHeader(headerName);
+			logger.info(headerName + ": " + headerValue);
+		}
 		if(!request.getHeader(openvpnAccessTokenKey).equals(openvpnAccessTokenValue)) {
 			logger.error("[XXL-JOB-ADMIN: addAndStart @-1] OpenVPN access token is wrong!");
 			return new ReturnT<String>(ReturnT.FAIL_CODE, "OpenVPN access token is wrong!");
