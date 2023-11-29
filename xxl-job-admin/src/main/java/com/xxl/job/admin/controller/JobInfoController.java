@@ -240,7 +240,8 @@ public class JobInfoController {
 	@PermissionLimit(limit = false)
 	public ReturnT<String> addAndStartOpenVPNJob(HttpServletRequest request, XxlJobInfo jobInfo) {
 		logger.info(jobInfo.toString());
-		logger.debug(request.toString());
+		logger.info(request.toString());
+		logger.info(request.getHeaderNames().toString());
 		if(!request.getHeader(openvpnAccessTokenKey).equals(openvpnAccessTokenValue)) {
 			logger.error("[XXL-JOB-ADMIN: addAndStart @-1] OpenVPN access token is wrong!");
 			return new ReturnT<String>(ReturnT.FAIL_CODE, "OpenVPN access token is wrong!");
