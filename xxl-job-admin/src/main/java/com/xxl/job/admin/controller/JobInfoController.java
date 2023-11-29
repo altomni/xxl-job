@@ -56,6 +56,13 @@ public class JobInfoController {
 	@Value("${emaily.access_token.value}")
 	private String emailyAccessTokenValue;
 
+	@Value("${openvpn.access_token.key}")
+	private String openvpnAccessTokenKey;
+
+
+	@Value("${openvpn.access_token.value}")
+	private String openvpnAccessTokenValue;
+
 	@Resource
 	private XxlJobInfoDao xxlJobInfoDao;
 
@@ -225,8 +232,22 @@ public class JobInfoController {
 			logger.error("[XXL-JOB-ADMIN: addAndStart @-1] Emaily access token is wrong!");
 			return new ReturnT<String>(ReturnT.FAIL_CODE, "Emaily access token is wrong!");
 		}
-
+		if(!request.getHeader(openvpnAccessTokenKey).equals(openvpnAccessTokenValue)) {
+			logger.error("[XXL-JOB-ADMIN: addAndStart @-1] OpenVPN access token is wrong!");
+			return new ReturnT<String>(ReturnT.FAIL_CODE, "OpenVPN access token is wrong!");
+		}
 		return xxlJobService.addAndStart(jobInfo);
+	}
+
+	@RequestMapping("/remove-job")
+	@ResponseBody
+	@PermissionLimit(limit = false)
+	public ReturnT<String> removeJob(HttpServletRequest request, int id) {
+		if(!request.getHeader(openvpnAccessTokenKey).equals(openvpnAccessTokenValue)) {
+			logger.error("[XXL-JOB-ADMIN: remove @-1] OpenVPN access token is wrong!");
+			return new ReturnT<String>(ReturnT.FAIL_CODE, "OpenVPN access token is wrong!");
+		}
+		return xxlJobService.remove(id);
 	}
 
 	@RequestMapping("/update-and-start")
@@ -234,8 +255,12 @@ public class JobInfoController {
 	@PermissionLimit(limit = false)
 	public ReturnT<String> updateAndStart(HttpServletRequest request, XxlJobInfo jobInfo) {
 		if (!request.getHeader(emailyAccessTokenKey).equals(emailyAccessTokenValue)) {
-			logger.error("[XXL-JOB-ADMIN: addAndStart @-1] Emaily access token is wrong!");
+			logger.error("[XXL-JOB-ADMIN: updateAndStart @-1] Emaily access token is wrong!");
 			return new ReturnT<String>(ReturnT.FAIL_CODE, "Emaily access token is wrong!");
+		}
+		if(!request.getHeader(openvpnAccessTokenKey).equals(openvpnAccessTokenValue)) {
+			logger.error("[XXL-JOB-ADMIN: updateAndStart @-1] OpenVPN access token is wrong!");
+			return new ReturnT<String>(ReturnT.FAIL_CODE, "OpenVPN access token is wrong!");
 		}
 		return xxlJobService.updateAndStart(jobInfo);
 	}
