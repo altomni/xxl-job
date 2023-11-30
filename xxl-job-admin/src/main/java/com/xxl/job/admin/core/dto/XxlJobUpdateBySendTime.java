@@ -9,6 +9,16 @@ public class XxlJobUpdateBySendTime {
 
     private Integer triggerStatus = 1;
 
+    private long triggerNextTime;
+
+    public long getTriggerNextTime() {
+        return triggerNextTime;
+    }
+
+    public void setTriggerNextTime(long triggerNextTime) {
+        this.triggerNextTime = triggerNextTime;
+    }
+
     public XxlJobUpdateBySendTime(Integer xxlJobId, String cron) {
         this.xxlJobId = xxlJobId;
         this.cron = cron;

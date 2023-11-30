@@ -261,7 +261,8 @@
 		<foreach collection="xxlJobInfoList" item="item" index="index" open="" close="" separator=";">
 			UPDATE xxl_job_info
 			set schedule_conf = #{item.cron},
-			trigger_status = #{item.triggerStatus}
+			trigger_status = #{item.triggerStatus},
+			trigger_next_time = #{item.triggerNextTime}
 			WHERE id = #{item.xxlJobId}
 		</foreach>
 	</update>

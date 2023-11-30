@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.text.MessageFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * core job action for xxl-job
@@ -469,6 +470,20 @@ public class XxlJobServiceImpl implements XxlJobService {
 
 	@Override
 	public ReturnT<String> updateJobsBySendTime(List<XxlJobUpdateBySendTime> xxlJobUpdateBySendTimeList) {
+		xxlJobUpdateBySendTimeList.forEach(xxlJobUpdateBySendTime -> {
+			Date nextValidTime = null;
+			try {
+				nextValidTime = new CronExpression(xxlJobUpdateBySendTime.getCron()).getNextValidTimeAfter(new Date(System.currentTimeMillis() + JobScheduleHelper.PRE_READ_MS));
+			} catch (Exception e) {
+			}
+			if (nextValidTime == null) {
+				xxlJobUpdateBySendTime.setTriggerNextTime(0);
+				xxlJobUpdateBySendTime.setTriggerStatus(0);
+			} else {
+				xxlJobUpdateBySendTime.setTriggerNextTime(nextValidTime.getTime());
+				xxlJobUpdateBySendTime.setTriggerStatus(1);
+			}
+		});
 		xxlJobInfoDao.updateScheduleAndParamBySendTimeBatch(xxlJobUpdateBySendTimeList);
 		return ReturnT.SUCCESS;
 	}
