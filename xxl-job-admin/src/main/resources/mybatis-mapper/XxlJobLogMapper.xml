@@ -164,6 +164,14 @@
 		WHERE job_id = #{jobId}
 	</delete>
 
+	<delete id="deleteAllByJobIdInBatch" parameterType="java.util.List">
+		delete from xxl_job_log
+		WHERE job_id IN
+		<foreach collection="jobIds" item="jobId" open="(" separator="," close=")">
+			#{jobId}
+		</foreach>
+	</delete>
+
     <!--<select id="triggerCountByDay" resultType="java.util.Map" >
 		SELECT
 			DATE_FORMAT(trigger_time,'%Y-%m-%d') triggerDay,

@@ -1,6 +1,7 @@
 package com.xxl.job.admin.service.impl;
 
 import com.xxl.job.admin.core.cron.CronExpression;
+import com.xxl.job.admin.core.dto.XxlJobUpdateBySendTime;
 import com.xxl.job.admin.core.model.XxlJobGroup;
 import com.xxl.job.admin.core.model.XxlJobInfo;
 import com.xxl.job.admin.core.model.XxlJobLogReport;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.text.MessageFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * core job action for xxl-job
@@ -41,7 +43,7 @@ public class XxlJobServiceImpl implements XxlJobService {
 	private XxlJobLogGlueDao xxlJobLogGlueDao;
 	@Resource
 	private XxlJobLogReportDao xxlJobLogReportDao;
-	
+
 	@Override
 	public Map<String, Object> pageList(int start, int length, int jobGroup, int triggerStatus, String jobDesc, String executorHandler, String author) {
 
@@ -457,4 +459,33 @@ public class XxlJobServiceImpl implements XxlJobService {
 		}
 		return start;
 	}
+
+	@Override
+	public ReturnT<String> deleteJobs(List<Integer> ids) {
+		xxlJobInfoDao.deleteAllByIdInBatch(ids);
+		xxlJobLogDao.deleteAllByJobIdInBatch(ids);
+		xxlJobLogGlueDao.deleteAllByJobIdInBatch(ids);
+		return ReturnT.SUCCESS;
+	}
+
+	@Override
+	public ReturnT<String> updateJobsBySendTime(List<XxlJobUpdateBySendTime> xxlJobUpdateBySendTimeList) {
+		xxlJobUpdateBySendTimeList.forEach(xxlJobUpdateBySendTime -> {
+			Date nextValidTime = null;
+			try {
+				nextValidTime = new CronExpression(xxlJobUpdateBySendTime.getCron()).getNextValidTimeAfter(new Date(System.currentTimeMillis() + JobScheduleHelper.PRE_READ_MS));
+			} catch (Exception e) {
+			}
+			if (nextValidTime == null) {
+				xxlJobUpdateBySendTime.setTriggerNextTime(0);
+				xxlJobUpdateBySendTime.setTriggerStatus(0);
+			} else {
+				xxlJobUpdateBySendTime.setTriggerNextTime(nextValidTime.getTime());
+				xxlJobUpdateBySendTime.setTriggerStatus(1);
+			}
+		});
+		xxlJobInfoDao.updateScheduleAndParamBySendTimeBatch(xxlJobUpdateBySendTimeList);
+		return ReturnT.SUCCESS;
+	}
+
 }

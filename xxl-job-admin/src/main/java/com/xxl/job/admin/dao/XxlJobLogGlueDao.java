@@ -20,5 +20,7 @@ public interface XxlJobLogGlueDao {
 	public int removeOld(@Param("jobId") int jobId, @Param("limit") int limit);
 
 	public int deleteByJobId(@Param("jobId") int jobId);
+
+	void deleteAllByJobIdInBatch(@Param("jobIds") List<Integer> ids);
 	
 }

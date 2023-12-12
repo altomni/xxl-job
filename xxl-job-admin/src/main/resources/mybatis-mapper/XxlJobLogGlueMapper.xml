@@ -67,5 +67,14 @@
 		DELETE FROM xxl_job_logglue
 		WHERE `job_id` = #{jobId}
 	</delete>
-	
+
+	<delete id="deleteAllByJobIdInBatch" parameterType="java.util.List">
+		delete from xxl_job_logglue
+		WHERE job_id IN
+		<foreach collection="jobIds" item="jobId" open="(" separator="," close=")">
+			#{jobId}
+		</foreach>
+	</delete>
+
+
 </mapper>
