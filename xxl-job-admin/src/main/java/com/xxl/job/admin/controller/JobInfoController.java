@@ -66,6 +66,12 @@ public class JobInfoController {
 	@Value("${openvpn.access_token.value}")
 	private String openvpnAccessTokenValue;
 
+	@Value("${crm.access_token.key}")
+	private String crmAccessTokenKey;
+
+	@Value("${crm.access_token.value}")
+	private String crmAccessTokenValue;
+
 	@Resource
 	private XxlJobInfoDao xxlJobInfoDao;
 
@@ -351,7 +357,7 @@ public class JobInfoController {
 	@ResponseBody
 	@PermissionLimit(limit = false)
 	public ReturnT<Map<String, Integer>> addJobs(HttpServletRequest request, @RequestBody List<XxlExtendJobInfo> jobInfoList) {
-		if (!request.getHeader(apnAccessTokenKey).equals(apnAccessTokenValue)) {
+		if (!request.getHeader(apnAccessTokenKey).equals(apnAccessTokenValue) || !request.getHeader(crmAccessTokenKey).equals(crmAccessTokenValue)) {
 			logger.error("[XXL-JOB-ADMIN: addJobs @-1] apn access token is wrong!");
 			return new ReturnT<>(ReturnT.FAIL_CODE, "apn access token is wrong!");
 		}
@@ -370,7 +376,7 @@ public class JobInfoController {
 	@PermissionLimit(limit = false)
 	public ReturnT<String> remove(HttpServletRequest request, @RequestBody List<Integer> ids) {
 		logger.info("[XXL-JOB-ADMIN: delete jobs @-1] delete jobs: {}", ids);
-		if (!request.getHeader(apnAccessTokenKey).equals(apnAccessTokenValue)) {
+		if (!request.getHeader(apnAccessTokenKey).equals(apnAccessTokenValue) || !request.getHeader(crmAccessTokenKey).equals(crmAccessTokenValue)) {
 			logger.error("[XXL-JOB-ADMIN: addJobs @-1] apn access token is wrong!");
 			return new ReturnT<>(ReturnT.FAIL_CODE, "apn access token is wrong!");
 		}
@@ -382,7 +388,7 @@ public class JobInfoController {
 	@PermissionLimit(limit = false)
 	public ReturnT<String> updateJobsBySendTime(HttpServletRequest request, @RequestBody List<XxlJobUpdateBySendTime> xxlJobUpdateBySendTime) {
 		logger.info("[XXL-JOB-ADMIN: update jobs by sendTime @-1] param : {}", xxlJobUpdateBySendTime);
-		if (!request.getHeader(apnAccessTokenKey).equals(apnAccessTokenValue)) {
+		if (!request.getHeader(apnAccessTokenKey).equals(apnAccessTokenValue) || !request.getHeader(crmAccessTokenKey).equals(crmAccessTokenValue)) {
 			logger.error("[XXL-JOB-ADMIN: addJobs @-1] apn access token is wrong!");
 			return new ReturnT<>(ReturnT.FAIL_CODE, "apn access token is wrong!");
 		}
@@ -394,7 +400,7 @@ public class JobInfoController {
 	@PermissionLimit(limit = false)
 	public ReturnT<String> myAdd(HttpServletRequest request, XxlJobInfo jobInfo) {
 		logger.info("[XXL-JOB-ADMIN: add job @-1] param : {}", jobInfo);
-		if (!request.getHeader(apnAccessTokenKey).equals(apnAccessTokenValue)) {
+		if (!request.getHeader(apnAccessTokenKey).equals(apnAccessTokenValue) || !request.getHeader(crmAccessTokenKey).equals(crmAccessTokenValue)) {
 			logger.error("[XXL-JOB-ADMIN: myAdd @-1] apn access token is wrong!");
 			return new ReturnT<>(ReturnT.FAIL_CODE, "apn access token is wrong!");
 		}
@@ -406,7 +412,7 @@ public class JobInfoController {
 	@PermissionLimit(limit = false)
 	public ReturnT<String> myUpdate(HttpServletRequest request, XxlJobInfo jobInfo) {
 		logger.info("[XXL-JOB-ADMIN: update job @-1] param : {}", jobInfo);
-		if (!request.getHeader(apnAccessTokenKey).equals(apnAccessTokenValue)) {
+		if (!request.getHeader(apnAccessTokenKey).equals(apnAccessTokenValue) || !request.getHeader(crmAccessTokenKey).equals(crmAccessTokenValue)) {
 			logger.error("[XXL-JOB-ADMIN: myUpdate @-1] apn access token is wrong!");
 			return new ReturnT<>(ReturnT.FAIL_CODE, "apn access token is wrong!");
 		}
@@ -418,7 +424,7 @@ public class JobInfoController {
 	@PermissionLimit(limit = false)
 	public ReturnT<String> myRemove(HttpServletRequest request, int id) {
 		logger.info("[XXL-JOB-ADMIN: remove job @-1] id : {}", id);
-		if (!request.getHeader(apnAccessTokenKey).equals(apnAccessTokenValue)) {
+		if (!request.getHeader(apnAccessTokenKey).equals(apnAccessTokenValue) || !request.getHeader(crmAccessTokenKey).equals(crmAccessTokenValue)) {
 			logger.error("[XXL-JOB-ADMIN: myRemove @-1] apn access token is wrong!");
 			return new ReturnT<>(ReturnT.FAIL_CODE, "apn access token is wrong!");
 		}
