@@ -24,11 +24,13 @@ import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.enums.ExecutorBlockStrategyEnum;
 import com.xxl.job.core.glue.GlueTypeEnum;
 import com.xxl.job.core.util.DateUtil;
+import org.codehaus.groovy.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -130,8 +132,8 @@ public class JobInfoController {
 	@RequestMapping("/pageList")
 	@ResponseBody
 	public Map<String, Object> pageList(@RequestParam(required = false, defaultValue = "0") int start,
-			@RequestParam(required = false, defaultValue = "10") int length,
-			int jobGroup, int triggerStatus, String jobDesc, String executorHandler, String author) {
+										@RequestParam(required = false, defaultValue = "10") int length,
+										int jobGroup, int triggerStatus, String jobDesc, String executorHandler, String author) {
 
 		return xxlJobService.pageList(start, length, jobGroup, triggerStatus, jobDesc, executorHandler, author);
 	}
@@ -357,10 +359,22 @@ public class JobInfoController {
 	@ResponseBody
 	@PermissionLimit(limit = false)
 	public ReturnT<Map<String, Integer>> addJobs(HttpServletRequest request, @RequestBody List<XxlExtendJobInfo> jobInfoList) {
-		if (!request.getHeader(apnAccessTokenKey).equals(apnAccessTokenValue) || !request.getHeader(crmAccessTokenKey).equals(crmAccessTokenValue)) {
+		if(StringUtils.isEmpty(apnAccessTokenKey) && StringUtils.isEmpty(crmAccessTokenKey)){
 			logger.error("[XXL-JOB-ADMIN: addJobs @-1] apn access token is wrong!");
 			return new ReturnT<>(ReturnT.FAIL_CODE, "apn access token is wrong!");
 		}
+		if (!StringUtils.isEmpty(apnAccessTokenKey)) {
+			if (!request.getHeader(apnAccessTokenKey).equals(apnAccessTokenValue)) {
+				logger.error("[XXL-JOB-ADMIN: addJobs @-1] apn access token is wrong!");
+				return new ReturnT<>(ReturnT.FAIL_CODE, "apn access token is wrong!");
+			}
+		} else if (!StringUtils.isEmpty(crmAccessTokenKey)) {
+			if (!request.getHeader(crmAccessTokenKey).equals(crmAccessTokenValue)) {
+				logger.error("[XXL-JOB-ADMIN: addJobs @-1] apn access token is wrong!");
+				return new ReturnT<>(ReturnT.FAIL_CODE, "apn access token is wrong!");
+			}
+		}
+
 		Map<String, Integer> successfulJobIds = new HashMap<>(16);
 		jobInfoList.forEach(jobInfo -> {
 			ReturnT<String> jobReturn = xxlJobService.add(jobInfo);
@@ -376,9 +390,20 @@ public class JobInfoController {
 	@PermissionLimit(limit = false)
 	public ReturnT<String> remove(HttpServletRequest request, @RequestBody List<Integer> ids) {
 		logger.info("[XXL-JOB-ADMIN: delete jobs @-1] delete jobs: {}", ids);
-		if (!request.getHeader(apnAccessTokenKey).equals(apnAccessTokenValue) || !request.getHeader(crmAccessTokenKey).equals(crmAccessTokenValue)) {
-			logger.error("[XXL-JOB-ADMIN: addJobs @-1] apn access token is wrong!");
+		if(StringUtils.isEmpty(apnAccessTokenKey) && StringUtils.isEmpty(crmAccessTokenKey)){
+			logger.error("[XXL-JOB-ADMIN: remove @-1] apn access token is wrong!");
 			return new ReturnT<>(ReturnT.FAIL_CODE, "apn access token is wrong!");
+		}
+		if (!StringUtils.isEmpty(apnAccessTokenKey)) {
+			if (!request.getHeader(apnAccessTokenKey).equals(apnAccessTokenValue)) {
+				logger.error("[XXL-JOB-ADMIN: remove @-1] apn access token is wrong!");
+				return new ReturnT<>(ReturnT.FAIL_CODE, "apn access token is wrong!");
+			}
+		} else if (!StringUtils.isEmpty(crmAccessTokenKey)) {
+			if (!request.getHeader(crmAccessTokenKey).equals(crmAccessTokenValue)) {
+				logger.error("[XXL-JOB-ADMIN: remove @-1] apn access token is wrong!");
+				return new ReturnT<>(ReturnT.FAIL_CODE, "apn access token is wrong!");
+			}
 		}
 		return xxlJobService.deleteJobs(ids);
 	}
@@ -388,9 +413,20 @@ public class JobInfoController {
 	@PermissionLimit(limit = false)
 	public ReturnT<String> updateJobsBySendTime(HttpServletRequest request, @RequestBody List<XxlJobUpdateBySendTime> xxlJobUpdateBySendTime) {
 		logger.info("[XXL-JOB-ADMIN: update jobs by sendTime @-1] param : {}", xxlJobUpdateBySendTime);
-		if (!request.getHeader(apnAccessTokenKey).equals(apnAccessTokenValue) || !request.getHeader(crmAccessTokenKey).equals(crmAccessTokenValue)) {
-			logger.error("[XXL-JOB-ADMIN: addJobs @-1] apn access token is wrong!");
+		if(StringUtils.isEmpty(apnAccessTokenKey) && StringUtils.isEmpty(crmAccessTokenKey)){
+			logger.error("[XXL-JOB-ADMIN: updateJobsBySendTime @-1] apn access token is wrong!");
 			return new ReturnT<>(ReturnT.FAIL_CODE, "apn access token is wrong!");
+		}
+		if (!StringUtils.isEmpty(apnAccessTokenKey)) {
+			if (!request.getHeader(apnAccessTokenKey).equals(apnAccessTokenValue)) {
+				logger.error("[XXL-JOB-ADMIN: updateJobsBySendTime @-1] apn access token is wrong!");
+				return new ReturnT<>(ReturnT.FAIL_CODE, "apn access token is wrong!");
+			}
+		} else if (!StringUtils.isEmpty(crmAccessTokenKey)) {
+			if (!request.getHeader(crmAccessTokenKey).equals(crmAccessTokenValue)) {
+				logger.error("[XXL-JOB-ADMIN: updateJobsBySendTime @-1] apn access token is wrong!");
+				return new ReturnT<>(ReturnT.FAIL_CODE, "apn access token is wrong!");
+			}
 		}
 		return xxlJobService.updateJobsBySendTime(xxlJobUpdateBySendTime);
 	}
@@ -400,9 +436,20 @@ public class JobInfoController {
 	@PermissionLimit(limit = false)
 	public ReturnT<String> myAdd(HttpServletRequest request, XxlJobInfo jobInfo) {
 		logger.info("[XXL-JOB-ADMIN: add job @-1] param : {}", jobInfo);
-		if (!request.getHeader(apnAccessTokenKey).equals(apnAccessTokenValue) || !request.getHeader(crmAccessTokenKey).equals(crmAccessTokenValue)) {
+		if(StringUtils.isEmpty(apnAccessTokenKey) && StringUtils.isEmpty(crmAccessTokenKey)){
 			logger.error("[XXL-JOB-ADMIN: myAdd @-1] apn access token is wrong!");
 			return new ReturnT<>(ReturnT.FAIL_CODE, "apn access token is wrong!");
+		}
+		if (!StringUtils.isEmpty(apnAccessTokenKey)) {
+			if (!request.getHeader(apnAccessTokenKey).equals(apnAccessTokenValue)) {
+				logger.error("[XXL-JOB-ADMIN: myAdd @-1] apn access token is wrong!");
+				return new ReturnT<>(ReturnT.FAIL_CODE, "apn access token is wrong!");
+			}
+		} else if (!StringUtils.isEmpty(crmAccessTokenKey)) {
+			if (!request.getHeader(crmAccessTokenKey).equals(crmAccessTokenValue)) {
+				logger.error("[XXL-JOB-ADMIN: myAdd @-1] apn access token is wrong!");
+				return new ReturnT<>(ReturnT.FAIL_CODE, "apn access token is wrong!");
+			}
 		}
 		return xxlJobService.add(jobInfo);
 	}
@@ -412,9 +459,20 @@ public class JobInfoController {
 	@PermissionLimit(limit = false)
 	public ReturnT<String> myUpdate(HttpServletRequest request, XxlJobInfo jobInfo) {
 		logger.info("[XXL-JOB-ADMIN: update job @-1] param : {}", jobInfo);
-		if (!request.getHeader(apnAccessTokenKey).equals(apnAccessTokenValue) || !request.getHeader(crmAccessTokenKey).equals(crmAccessTokenValue)) {
+		if(StringUtils.isEmpty(apnAccessTokenKey) && StringUtils.isEmpty(crmAccessTokenKey)){
 			logger.error("[XXL-JOB-ADMIN: myUpdate @-1] apn access token is wrong!");
 			return new ReturnT<>(ReturnT.FAIL_CODE, "apn access token is wrong!");
+		}
+		if (!StringUtils.isEmpty(apnAccessTokenKey)) {
+			if (!request.getHeader(apnAccessTokenKey).equals(apnAccessTokenValue)) {
+				logger.error("[XXL-JOB-ADMIN: myUpdate @-1] apn access token is wrong!");
+				return new ReturnT<>(ReturnT.FAIL_CODE, "apn access token is wrong!");
+			}
+		} else if (!StringUtils.isEmpty(crmAccessTokenKey)) {
+			if (!request.getHeader(crmAccessTokenKey).equals(crmAccessTokenValue)) {
+				logger.error("[XXL-JOB-ADMIN: myUpdate @-1] apn access token is wrong!");
+				return new ReturnT<>(ReturnT.FAIL_CODE, "apn access token is wrong!");
+			}
 		}
 		return xxlJobService.update(jobInfo);
 	}
@@ -424,9 +482,20 @@ public class JobInfoController {
 	@PermissionLimit(limit = false)
 	public ReturnT<String> myRemove(HttpServletRequest request, int id) {
 		logger.info("[XXL-JOB-ADMIN: remove job @-1] id : {}", id);
-		if (!request.getHeader(apnAccessTokenKey).equals(apnAccessTokenValue) || !request.getHeader(crmAccessTokenKey).equals(crmAccessTokenValue)) {
+		if(StringUtils.isEmpty(apnAccessTokenKey) && StringUtils.isEmpty(crmAccessTokenKey)){
 			logger.error("[XXL-JOB-ADMIN: myRemove @-1] apn access token is wrong!");
 			return new ReturnT<>(ReturnT.FAIL_CODE, "apn access token is wrong!");
+		}
+		if (!StringUtils.isEmpty(apnAccessTokenKey)) {
+			if (!request.getHeader(apnAccessTokenKey).equals(apnAccessTokenValue)) {
+				logger.error("[XXL-JOB-ADMIN: myRemove @-1] apn access token is wrong!");
+				return new ReturnT<>(ReturnT.FAIL_CODE, "apn access token is wrong!");
+			}
+		} else if (!StringUtils.isEmpty(crmAccessTokenKey)) {
+			if (!request.getHeader(crmAccessTokenKey).equals(crmAccessTokenValue)) {
+				logger.error("[XXL-JOB-ADMIN: myRemove @-1] apn access token is wrong!");
+				return new ReturnT<>(ReturnT.FAIL_CODE, "apn access token is wrong!");
+			}
 		}
 		return xxlJobService.remove(id);
 	}
