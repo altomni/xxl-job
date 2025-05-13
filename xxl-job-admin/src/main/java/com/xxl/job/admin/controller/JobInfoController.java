@@ -2,6 +2,7 @@ package com.xxl.job.admin.controller;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.xxl.job.admin.config.TokenValidator;
 import com.xxl.job.admin.controller.annotation.PermissionLimit;
 import com.xxl.job.admin.core.dto.XxlJobUpdateBySendTime;
 import com.xxl.job.admin.core.exception.XxlJobException;
@@ -58,29 +59,14 @@ public class JobInfoController {
     @Value("${emaily.access_token.value}")
     private String emailyAccessTokenValue;
 
-    @Value("${apn.access_token.key}")
-    private String apnAccessTokenKey;
-
-    @Value("${apn.access_token.value}")
-    private String apnAccessTokenValue;
     @Value("${openvpn.access_token.key}")
     private String openvpnAccessTokenKey;
 
     @Value("${openvpn.access_token.value}")
     private String openvpnAccessTokenValue;
 
-    @Value("${crm.access_token.key}")
-    private String crmAccessTokenKey;
-
-    @Value("${crm.access_token.value}")
-    private String crmAccessTokenValue;
-
-    @Value("${uoffer.access_token.key}")
-    private String uofferAccessTokenKey;
-
-    @Value("${uoffer.access_token.value}")
-    private String uofferAccessTokenValue;
-
+    @Resource
+    private TokenValidator tokenValidator;
 
     @Resource
     private XxlJobInfoDao xxlJobInfoDao;
@@ -366,20 +352,10 @@ public class JobInfoController {
     @ResponseBody
     @PermissionLimit(limit = false)
     public ReturnT<Map<String, Integer>> addJobs(HttpServletRequest request, @RequestBody List<XxlExtendJobInfo> jobInfoList) {
-        if (!RequestHeaderCheckUtils.checkRequestHeaderContainTokenKey(request, apnAccessTokenKey, crmAccessTokenKey, uofferAccessTokenKey)) {
-            logger.error("[XXL-JOB-ADMIN: addJobs @-1] access token doesn't exist!");
-            return new ReturnT<>(ReturnT.FAIL_CODE, "access token doesn't exist");
+        if (tokenValidator.validateTokens(request)) {
+            logger.error("[XXL-JOB-ADMIN: addJobs @-1] access token is wrong!");
+            return new ReturnT<>(ReturnT.FAIL_CODE, " access token is wrong!");
         }
-        if (!RequestHeaderCheckUtils.checkRequestHeaderAccess(request, apnAccessTokenKey, apnAccessTokenValue)) {
-            return new ReturnT<>(ReturnT.FAIL_CODE, "apn access token is wrong!");
-        } else if (!RequestHeaderCheckUtils.checkRequestHeaderAccess(request, crmAccessTokenKey, crmAccessTokenValue)) {
-            logger.error("[XXL-JOB-ADMIN: addJobs @-1] crm access token is wrong!");
-            return new ReturnT<>(ReturnT.FAIL_CODE, "crm access token is wrong!");
-        }else if (!RequestHeaderCheckUtils.checkRequestHeaderAccess(request, uofferAccessTokenKey, uofferAccessTokenValue)){
-            logger.error("[XXL-JOB-ADMIN: addJobs @-1] uoffer access token is wrong!");
-            return new ReturnT<>(ReturnT.FAIL_CODE, "uoffer access token is wrong!");
-        }
-
         Map<String, Integer> successfulJobIds = new HashMap<>(16);
         jobInfoList.forEach(jobInfo -> {
             ReturnT<String> jobReturn = xxlJobService.add(jobInfo);
@@ -395,18 +371,9 @@ public class JobInfoController {
     @PermissionLimit(limit = false)
     public ReturnT<String> remove(HttpServletRequest request, @RequestBody List<Integer> ids) {
         logger.info("[XXL-JOB-ADMIN: delete jobs @-1] delete jobs: {}", ids);
-        if (!RequestHeaderCheckUtils.checkRequestHeaderContainTokenKey(request, apnAccessTokenKey, crmAccessTokenKey, uofferAccessTokenKey)) {
-            logger.error("[XXL-JOB-ADMIN: addJobs @-1] access token doesn't exist!");
-            return new ReturnT<>(ReturnT.FAIL_CODE, "access token doesn't exist");
-        }
-        if (!RequestHeaderCheckUtils.checkRequestHeaderAccess(request, apnAccessTokenKey, apnAccessTokenValue)) {
-            return new ReturnT<>(ReturnT.FAIL_CODE, "apn access token is wrong!");
-        } else if (!RequestHeaderCheckUtils.checkRequestHeaderAccess(request, crmAccessTokenKey, crmAccessTokenValue)) {
-            logger.error("[XXL-JOB-ADMIN: addJobs @-1] crm access token is wrong!");
-            return new ReturnT<>(ReturnT.FAIL_CODE, "crm access token is wrong!");
-        }else if (!RequestHeaderCheckUtils.checkRequestHeaderAccess(request, uofferAccessTokenKey, uofferAccessTokenValue)){
-            logger.error("[XXL-JOB-ADMIN: addJobs @-1] uoffer access token is wrong!");
-            return new ReturnT<>(ReturnT.FAIL_CODE, "uoffer access token is wrong!");
+        if (!tokenValidator.validateTokens(request)) {
+            logger.error("[XXL-JOB-ADMIN: delete jobs @-1] access token is wrong!");
+            return new ReturnT<>(ReturnT.FAIL_CODE, " access token is wrong!");
         }
         return xxlJobService.deleteJobs(ids);
     }
@@ -416,18 +383,9 @@ public class JobInfoController {
     @PermissionLimit(limit = false)
     public ReturnT<String> updateJobsBySendTime(HttpServletRequest request, @RequestBody List<XxlJobUpdateBySendTime> xxlJobUpdateBySendTime) {
         logger.info("[XXL-JOB-ADMIN: update jobs by sendTime @-1] param : {}", xxlJobUpdateBySendTime);
-        if (!RequestHeaderCheckUtils.checkRequestHeaderContainTokenKey(request, apnAccessTokenKey, crmAccessTokenKey, uofferAccessTokenKey)) {
-            logger.error("[XXL-JOB-ADMIN: addJobs @-1] access token doesn't exist!");
-            return new ReturnT<>(ReturnT.FAIL_CODE, "access token doesn't exist");
-        }
-        if (!RequestHeaderCheckUtils.checkRequestHeaderAccess(request, apnAccessTokenKey, apnAccessTokenValue)) {
-            return new ReturnT<>(ReturnT.FAIL_CODE, "apn access token is wrong!");
-        } else if (!RequestHeaderCheckUtils.checkRequestHeaderAccess(request, crmAccessTokenKey, crmAccessTokenValue)) {
-            logger.error("[XXL-JOB-ADMIN: addJobs @-1] crm access token is wrong!");
-            return new ReturnT<>(ReturnT.FAIL_CODE, "crm access token is wrong!");
-        }else if (!RequestHeaderCheckUtils.checkRequestHeaderAccess(request, uofferAccessTokenKey, uofferAccessTokenValue)){
-            logger.error("[XXL-JOB-ADMIN: addJobs @-1] uoffer access token is wrong!");
-            return new ReturnT<>(ReturnT.FAIL_CODE, "uoffer access token is wrong!");
+        if (!tokenValidator.validateTokens(request)) {
+            logger.error("[XXL-JOB-ADMIN: update jobs by sendTime jobs @-1] access token is wrong!");
+            return new ReturnT<>(ReturnT.FAIL_CODE, " access token is wrong!");
         }
         return xxlJobService.updateJobsBySendTime(xxlJobUpdateBySendTime);
     }
@@ -437,18 +395,9 @@ public class JobInfoController {
     @PermissionLimit(limit = false)
     public ReturnT<String> myAdd(HttpServletRequest request, XxlJobInfo jobInfo) {
         logger.info("[XXL-JOB-ADMIN: add job @-1] param : {}", jobInfo);
-        if (!RequestHeaderCheckUtils.checkRequestHeaderContainTokenKey(request, apnAccessTokenKey, crmAccessTokenKey, uofferAccessTokenKey)) {
-            logger.error("[XXL-JOB-ADMIN: addJobs @-1] access token doesn't exist!");
-            return new ReturnT<>(ReturnT.FAIL_CODE, "access token doesn't exist");
-        }
-        if (!RequestHeaderCheckUtils.checkRequestHeaderAccess(request, apnAccessTokenKey, apnAccessTokenValue)) {
-            return new ReturnT<>(ReturnT.FAIL_CODE, "apn access token is wrong!");
-        } else if (!RequestHeaderCheckUtils.checkRequestHeaderAccess(request, crmAccessTokenKey, crmAccessTokenValue)) {
-            logger.error("[XXL-JOB-ADMIN: addJobs @-1] crm access token is wrong!");
-            return new ReturnT<>(ReturnT.FAIL_CODE, "crm access token is wrong!");
-        }else if (!RequestHeaderCheckUtils.checkRequestHeaderAccess(request, uofferAccessTokenKey, uofferAccessTokenValue)){
-            logger.error("[XXL-JOB-ADMIN: addJobs @-1] uoffer access token is wrong!");
-            return new ReturnT<>(ReturnT.FAIL_CODE, "uoffer access token is wrong!");
+        if (!tokenValidator.validateTokens(request)) {
+            logger.error("[XXL-JOB-ADMIN: add job @-1] access token is wrong!");
+            return new ReturnT<>(ReturnT.FAIL_CODE, " access token is wrong!");
         }
         return xxlJobService.add(jobInfo);
     }
@@ -458,18 +407,9 @@ public class JobInfoController {
     @PermissionLimit(limit = false)
     public ReturnT<String> myUpdate(HttpServletRequest request, XxlJobInfo jobInfo) {
         logger.info("[XXL-JOB-ADMIN: update job @-1] param : {}", jobInfo);
-        if (!RequestHeaderCheckUtils.checkRequestHeaderContainTokenKey(request, apnAccessTokenKey, crmAccessTokenKey, uofferAccessTokenKey)) {
-            logger.error("[XXL-JOB-ADMIN: addJobs @-1] access token doesn't exist!");
-            return new ReturnT<>(ReturnT.FAIL_CODE, "access token doesn't exist");
-        }
-        if (!RequestHeaderCheckUtils.checkRequestHeaderAccess(request, apnAccessTokenKey, apnAccessTokenValue)) {
-            return new ReturnT<>(ReturnT.FAIL_CODE, "apn access token is wrong!");
-        } else if (!RequestHeaderCheckUtils.checkRequestHeaderAccess(request, crmAccessTokenKey, crmAccessTokenValue)) {
-            logger.error("[XXL-JOB-ADMIN: addJobs @-1] crm access token is wrong!");
-            return new ReturnT<>(ReturnT.FAIL_CODE, "crm access token is wrong!");
-        }else if (!RequestHeaderCheckUtils.checkRequestHeaderAccess(request, uofferAccessTokenKey, uofferAccessTokenValue)){
-            logger.error("[XXL-JOB-ADMIN: addJobs @-1] uoffer access token is wrong!");
-            return new ReturnT<>(ReturnT.FAIL_CODE, "uoffer access token is wrong!");
+        if (!tokenValidator.validateTokens(request)) {
+            logger.error("[XXL-JOB-ADMIN: update job @-1] access token is wrong!");
+            return new ReturnT<>(ReturnT.FAIL_CODE, " access token is wrong!");
         }
         return xxlJobService.update(jobInfo);
     }
@@ -479,18 +419,9 @@ public class JobInfoController {
     @PermissionLimit(limit = false)
     public ReturnT<String> myRemove(HttpServletRequest request, int id) {
         logger.info("[XXL-JOB-ADMIN: remove job @-1] id : {}", id);
-        if (!RequestHeaderCheckUtils.checkRequestHeaderContainTokenKey(request, apnAccessTokenKey, crmAccessTokenKey, uofferAccessTokenKey)) {
-            logger.error("[XXL-JOB-ADMIN: addJobs @-1] access token doesn't exist!");
-            return new ReturnT<>(ReturnT.FAIL_CODE, "access token doesn't exist");
-        }
-        if (!RequestHeaderCheckUtils.checkRequestHeaderAccess(request, apnAccessTokenKey, apnAccessTokenValue)) {
-            return new ReturnT<>(ReturnT.FAIL_CODE, "apn access token is wrong!");
-        } else if (!RequestHeaderCheckUtils.checkRequestHeaderAccess(request, crmAccessTokenKey, crmAccessTokenValue)) {
-            logger.error("[XXL-JOB-ADMIN: addJobs @-1] crm access token is wrong!");
-            return new ReturnT<>(ReturnT.FAIL_CODE, "crm access token is wrong!");
-        }else if (!RequestHeaderCheckUtils.checkRequestHeaderAccess(request, uofferAccessTokenKey, uofferAccessTokenValue)){
-            logger.error("[XXL-JOB-ADMIN: addJobs @-1] uoffer access token is wrong!");
-            return new ReturnT<>(ReturnT.FAIL_CODE, "uoffer access token is wrong!");
+        if (!tokenValidator.validateTokens(request)) {
+            logger.error("[XXL-JOB-ADMIN: remove job @-1] access token is wrong!");
+            return new ReturnT<>(ReturnT.FAIL_CODE, " access token is wrong!");
         }
         return xxlJobService.remove(id);
     }
