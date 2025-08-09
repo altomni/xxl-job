@@ -1,6 +1,7 @@
 package com.xxl.job.admin.config;
 
 import com.xxl.job.admin.controller.JobInfoController;
+import io.micrometer.core.instrument.util.JsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,9 +34,14 @@ public class TokenValidator {
         TOKEN_MAP.put(crmAccessTokenKey, crmAccessTokenValue);
         TOKEN_MAP.put(uofferAccessTokenKey, uofferAccessTokenValue);
         TOKEN_MAP.put(hrAccessTokenKey, hrAccessTokenValue);
+        logger.info("apn key = {}, apn value = {}", apnAccessTokenKey, apnAccessTokenValue);
+        logger.info("crm key = {}, crm value = {}", crmAccessTokenKey, crmAccessTokenValue);
+        logger.info("uoffer key = {}, uoffer value = {}", uofferAccessTokenKey, uofferAccessTokenValue);
+        logger.info("hr key = {}, hr value = {}", hrAccessTokenKey, hrAccessTokenValue);
     }
 
     public boolean validateTokens(HttpServletRequest request) {
+        logger.info("Starting token validation process");
         // 先检查请求头中是否包含所有令牌键
         if (!checkRequestHeaderContainTokenKey(request, TOKEN_MAP.keySet().toArray(new String[0]))) {
             logger.info("access token doesn't exist!");
@@ -45,11 +51,13 @@ public class TokenValidator {
         for (Map.Entry<String, String> entry : TOKEN_MAP.entrySet()) {
             String tokenKey = entry.getKey();
             String expectedTokenValue = entry.getValue();
+            logger.info("Validating token key: {}", tokenKey);
             if (!checkRequestHeaderAccess(request, tokenKey, expectedTokenValue)) {
-                logger.info("access token is wrong!");
+                logger.info("access token is wrong for key: {}, value = {}", tokenKey, request.getHeader(tokenKey));
                 return false;
             }
         }
+        logger.info("All tokens validated successfully");
         return true;
     }
 
