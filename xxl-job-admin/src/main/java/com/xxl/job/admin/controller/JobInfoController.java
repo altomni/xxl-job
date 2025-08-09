@@ -352,7 +352,7 @@ public class JobInfoController {
     @ResponseBody
     @PermissionLimit(limit = false)
     public ReturnT<Map<String, Integer>> addJobs(HttpServletRequest request, @RequestBody List<XxlExtendJobInfo> jobInfoList) {
-        if (tokenValidator.validateTokens(request)) {
+        if (!tokenValidator.validateTokens(request)) {
             logger.error("[XXL-JOB-ADMIN: addJobs @-1] access token is wrong!");
             return new ReturnT<>(ReturnT.FAIL_CODE, " access token is wrong!");
         }
