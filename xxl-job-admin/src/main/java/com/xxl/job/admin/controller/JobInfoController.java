@@ -411,7 +411,12 @@ public class JobInfoController {
             logger.error("[XXL-JOB-ADMIN: update job @-1] access token is wrong!");
             return new ReturnT<>(ReturnT.FAIL_CODE, " access token is wrong!");
         }
-        return xxlJobService.update(jobInfo);
+        ReturnT<String> updateReturn = xxlJobService.update(jobInfo);
+        if (updateReturn.getCode() == ReturnT.FAIL_CODE) {
+            return updateReturn;
+        }
+        xxlJobService.start(jobInfo.getId());
+        return updateReturn;
     }
 
     @RequestMapping("/my-remove")
